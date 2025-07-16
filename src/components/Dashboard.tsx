@@ -1,35 +1,27 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { Header } from './Header';
+import { Main } from './Main';
+import { Footer } from './Footer';
+import { fetchNotifications, fetchUserData } from '@/api/fakeApi';
+import { User } from '@/types/User';
 
-// Fake API
-const fetchUserData = () =>
-  new Promise(res =>
-    setTimeout(() => res({ name: 'Alice', age: 28, loggedIn: true }), 800)
-  );
-
-const fetchNotifications = () =>
-  new Promise(res =>
-    setTimeout(() => res(['Welcome!', 'Update your profile.']), 1000)
-  );
-
-// Context (badly implemented)
 const AppContext = createContext();
 
 export const Dashboard = () => {
-  const [user, setUser] = useState(null);
-  const [userAge, setUserAge] = useState(null); // duplicate state
+  const [user, setUser] = useState<User | null>(null);
+  const [userAge, setUserAge] = useState<number | null>(null); // duplicate state
   const [loading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notificationCount, setNotificationCount] = useState(0); // derived state
-  const [error, setError] = useState(null);
-  const [theme, setTheme] = useState('light');
+  const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  // Context is used in a weird way
   const contextValue = {
     user,
     notifications,
     theme,
     toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light'),
-    addNotification: n => {
+    addNotification: (n: Notification) => {
       setNotifications([...notifications, n]);
       setNotificationCount(notificationCount + 1);
     },
@@ -37,17 +29,17 @@ export const Dashboard = () => {
 
   useEffect(() => {
     fetchUserData()
-      .then(data => {
+      .then((data: User) => {
         setUser(data);
         setUserAge(data.age); // redundant
         setLoading(false);
       })
-      .catch(err => setError('Failed to load user'));
+      .catch(() => setError('Failed to load user'));
   }, []);
 
   useEffect(() => {
     fetchNotifications()
-      .then(notes => {
+      .then((notes: Notification[]) => {
         setNotifications(notes);
         setNotificationCount(notes.length);
       })
@@ -73,51 +65,3 @@ export const Dashboard = () => {
     </AppContext.Provider>
   );
 };
-
-function Header() {
-  const { user, toggleTheme, theme } = useContext(AppContext);
-  return (
-    <header>
-      <h1>Welcome, {user.name}</h1>
-      <button onClick={toggleTheme}>
-        Switch to {theme === 'light' ? 'dark' : 'light'} theme
-      </button>
-    </header>
-  );
-}
-
-function Main() {
-  const { notifications, addNotification } = useContext(AppContext);
-  const [input, setInput] = useState('');
-
-  return (
-    <main>
-      <h2>Notifications</h2>
-      <ul>
-        {notifications.map((n, i) => (
-          <li key={i}>{n}</li>
-        ))}
-      </ul>
-      <input
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        placeholder='New notification'
-      />
-      <button
-        onClick={() => {
-          if (input.trim()) {
-            addNotification(input.trim());
-            setInput('');
-          }
-        }}
-      >
-        Add
-      </button>
-    </main>
-  );
-}
-
-function Footer() {
-  const { user } = useContext(AppContext);
-  return <footer>User is {user.loggedIn ? 'logged in' : 'logged out'}</footer>;
-}
