@@ -1,5 +1,10 @@
 import { Dashboard } from './components/Dashboard';
+import { ThemeProvider } from './context/useTheme';
 
 export const App = () => {
-  return <Dashboard />;
+  return (
+    <ThemeProvider>
+      <Dashboard />
+    </ThemeProvider>
+  );
 };
