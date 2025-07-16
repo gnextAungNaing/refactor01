@@ -1,5 +1,6 @@
-import { User } from "@/types/User";
+import { useUser } from "@/context/useUser";
 
-export const Footer = ({ user }: { user: User | null }) => {
+export const Footer = () => {
+  const { user } = useUser();
   return <footer>User is {user?.loggedIn ? 'logged in' : 'logged out'}</footer>;
 }
