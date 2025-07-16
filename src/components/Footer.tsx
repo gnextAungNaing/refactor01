@@ -1,6 +1,5 @@
-import { useContext } from "react";
+import { User } from "@/types/User";
 
-export const Footer = () => {
-  const { user } = useContext(AppContext);
-  return <footer>User is {user.loggedIn ? 'logged in' : 'logged out'}</footer>;
+export const Footer = ({ user }: { user: User | null }) => {
+  return <footer>User is {user?.loggedIn ? 'logged in' : 'logged out'}</footer>;
 }
