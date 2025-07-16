@@ -1,5 +1,13 @@
 import { Dashboard } from './components/Dashboard';
+import { ThemeProvider } from './context/useTheme';
+import { UserProvider } from './context/useUser';
 
 export const App = () => {
-  return <Dashboard />;
+  return (
+    <ThemeProvider>
+      <UserProvider>
+        <Dashboard />
+      </UserProvider>
+    </ThemeProvider>
+  );
 };
